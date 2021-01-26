@@ -10,13 +10,16 @@ import co.micol.mvc.common.DAO;
 
 public class BoardsDAO extends DAO {// 상위 DAO 상속받아서 만든단 소리
 	// 보드테이블 접속하는 DAO
-	private PreparedStatement psmt;
-	private ResultSet rs;// recordset을 담는다?
+	private PreparedStatement psmt;//object 변수 선언
+	private ResultSet rs;// recordset을 담는다? //Object타입
 	// sequal
+	//final 키워드로 상수선언(불변이라서)
+	//참조의 중요성
 	private final String BOARDSELECTLIST = "SELECT * FROM BOARDS ORDER BY BOARD_NO DESC";
 	private final String BOARDSELECT = "SELECT * FROM BOARDS WHERE BOARD_NO=?";
 	private final String BOARDINSERT = "INSERT INTO BOARDS VALUES(?,?,?,?,?)";
 	private final String BOARDDELETE = "DELETE FROM BOARDS WHERE BOARD_NO=?";
+	private final String BOARDUPDATE = "UPDATE BOARDS SET TITLE =?,CONTENT=? WHERE BOARD_NO=?";
 
 	public ArrayList<BoardVO> selectList() {
 		ArrayList<BoardVO> list = new ArrayList<BoardVO>();
@@ -63,7 +66,7 @@ public class BoardsDAO extends DAO {// 상위 DAO 상속받아서 만든단 소�
 		}
 		return vo;
 	}
-
+	
 	public int insert(BoardVO vo) { // boards 테이블에 데이터를 삽입
 		int n = 0;
 		try {
@@ -85,7 +88,18 @@ public class BoardsDAO extends DAO {// 상위 DAO 상속받아서 만든단 소�
 
 	public int update(BoardVO vo) {
 		int n = 0;
-		// 여기에 수정
+		try {
+			psmt = conn.prepareStatement(BOARDUPDATE);
+			psmt.setString(1, vo.getTitle());
+			psmt.setString(2, vo.getContent());
+			psmt.setInt(3, vo.getBoardNo());
+			n = psmt.executeUpdate();
+			System.out.println(n + "건이 업데이트 되었습니다.");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			close();
+		}
 		return n;
 	}
 
